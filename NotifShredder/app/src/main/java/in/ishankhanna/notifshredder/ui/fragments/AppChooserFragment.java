@@ -11,6 +11,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import java.util.List;
 
 import in.ishankhanna.notifshredder.R;
@@ -44,6 +47,11 @@ public class AppChooserFragment extends Fragment implements AdapterView.OnItemCl
 
         lv_notifApp = (ListView) rootView.findViewById(R.id.lv_notifApp);
 
+        AdView mAdView = (AdView) rootView.findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+        mAdView.loadAd(adRequest);
         initList();
 
         return rootView;
