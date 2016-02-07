@@ -17,6 +17,7 @@ public class SharedPreferenceHelper {
 
     public static final String IS_FIRST_TIME = "IS_FIRST_TIME";
     public static final String BLOCKED_APP_NAMES = "BLOCKED_APP_NAMES";
+    public static final String BLOCKED_NOTIFICATIONS_COUNT = "BLOCKED_NOTIFICATIONS_COUNT";
 
     private static SharedPreferenceHelper instance;
     private SharedPreferences sharedPreferences;
@@ -117,6 +118,16 @@ public class SharedPreferenceHelper {
             blockApp(appName);
         }
 
+    }
+
+    public int getBlockNotificationCount() {
+        return sharedPreferences.getInt(BLOCKED_NOTIFICATIONS_COUNT, 0);
+    }
+
+    public void incrementBlockedNotificationCount() {
+        int count = getBlockNotificationCount();
+        count++;
+        sharedPreferences.edit().putInt(BLOCKED_NOTIFICATIONS_COUNT, count).apply();
     }
 
 }

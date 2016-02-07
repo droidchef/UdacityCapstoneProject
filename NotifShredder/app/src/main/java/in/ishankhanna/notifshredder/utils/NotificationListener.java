@@ -25,6 +25,7 @@ public class NotificationListener extends NotificationListenerService {
         Log.d("ShredderService", packageName);
         if (sharedPreferenceHelper.isBlocked(packageName)) {
             cancelNotification(sbn.getKey());
+            sharedPreferenceHelper.incrementBlockedNotificationCount();
             Log.d("ShredderService", packageName + "will be canceled");
         }
 
