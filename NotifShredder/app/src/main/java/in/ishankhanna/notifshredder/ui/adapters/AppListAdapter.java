@@ -64,7 +64,7 @@ public class AppListAdapter extends ArrayAdapter<ApplicationInfo> {
             LinearLayout mainRow = (LinearLayout) view.findViewById(R.id.row_main);
 
             TextView appName = (TextView) view.findViewById(R.id.app_name);
-            TextView packageName = (TextView) view.findViewById(R.id.app_paackage);
+            TextView packageName = (TextView) view.findViewById(R.id.app_package);
             ImageView iconview = (ImageView) view.findViewById(R.id.app_icon);
 
             appName.setText(applicationInfo.loadLabel(packageManager));
