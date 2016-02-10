@@ -2,9 +2,13 @@ package in.ishankhanna.notifshredder.ui.fragments;
 
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,19 +21,22 @@ import com.google.android.gms.ads.AdView;
 import java.util.List;
 
 import in.ishankhanna.notifshredder.R;
-import in.ishankhanna.notifshredder.ui.adapters.AppListAdapter;
+import in.ishankhanna.notifshredder.provider.installedapplication.InstalledapplicationColumns;
+import in.ishankhanna.notifshredder.provider.installedapplication.InstalledapplicationSelection;
+import in.ishankhanna.notifshredder.ui.adapters.AppListCursorAdapter;
 import in.ishankhanna.notifshredder.utils.SharedPreferenceHelper;
 
 /**
  * Created by ishan on 01/02/16.
  */
-public class AppChooserFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class AppChooserFragment extends Fragment implements
+        AdapterView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     ListView lv_notifApp;
-    AppListAdapter appListAdapter;
     private PackageManager packageManager = null;
     private List<ApplicationInfo> applist = null;
     SharedPreferenceHelper sharedPreferenceHelper;
+    AppListCursorAdapter appListCursorAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,11 +66,7 @@ public class AppChooserFragment extends Fragment implements AdapterView.OnItemCl
 
     private void initList() {
 
-        applist = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
-
-        appListAdapter = new AppListAdapter(getActivity(), R.layout.snippet_list_row, applist);
-
-        lv_notifApp.setAdapter(appListAdapter);
+        getLoaderManager().initLoader(0, null, this);
 
         lv_notifApp.setOnItemClickListener(this);
     }
@@ -72,6 +75,32 @@ public class AppChooserFragment extends Fragment implements AdapterView.OnItemCl
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
         sharedPreferenceHelper.toggleBlockForAppName(applist.get(position).packageName);
-        appListAdapter.notifyDataSetChanged();
+
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        InstalledapplicationSelection installedapplicationSelection
+                = new InstalledapplicationSelection();
+
+        return new CursorLoader(getContext(), InstalledapplicationColumns.CONTENT_URI,InstalledapplicationColumns.ALL_COLUMNS, installedapplicationSelection.sel(), installedapplicationSelection.args(), null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        appListCursorAdapter = new AppListCursorAdapter(getContext(),
+                data, false);
+        lv_notifApp.setAdapter(appListCursorAdapter);
+        appListCursorAdapter.swapCursor(data);
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+        appListCursorAdapter.swapCursor(null);
+
     }
 }

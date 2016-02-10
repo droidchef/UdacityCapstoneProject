@@ -1,12 +1,18 @@
 package in.ishankhanna.notifshredder;
 
 import android.app.Application;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.StandardExceptionParser;
 import com.google.android.gms.analytics.Tracker;
 
+import java.util.List;
+
+import in.ishankhanna.notifshredder.provider.installedapplication.InstalledapplicationContentValues;
 import in.ishankhanna.notifshredder.utils.AnalyticsTrackers;
 
 /**
@@ -23,7 +29,27 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         mInstance = this;
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
 
+                List<ApplicationInfo> applicationInfoList = MyApplication
+                         .getInstance().getApplicationContext()
+                         .getPackageManager()
+                         .getInstalledApplications(PackageManager.GET_META_DATA);
+
+                for (ApplicationInfo ai : applicationInfoList) {
+                    InstalledapplicationContentValues installedapplicationContentValues
+                            = new InstalledapplicationContentValues();
+
+                    installedapplicationContentValues.putName(ai.loadLabel(getApplicationContext().getPackageManager()).toString());
+                    installedapplicationContentValues.putPackageName(ai.packageName);
+                    getApplicationContext().getContentResolver().insert(installedapplicationContentValues.uri(), installedapplicationContentValues.values());
+                }
+
+                return null;
+            }
+        }.execute();
         AnalyticsTrackers.initialize(this);
         AnalyticsTrackers.getInstance().get(AnalyticsTrackers.Target.APP);
     }
